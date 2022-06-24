@@ -15,6 +15,7 @@ public class NewCommentaryDTO {
     private String commentary;
     private Float score;
 
+
     public NewCommentaryDTO(Commentary commentary){
         this.userId = commentary.getUser().getId();
         this.movieId = commentary.getMovie().getId();

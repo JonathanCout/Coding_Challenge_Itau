@@ -13,17 +13,18 @@ import java.util.List;
 public class Movie {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
+    private String iMoBid;
+    private String title;
     private String year;
     private float score;
+    @OneToMany(mappedBy = "movie")
     private List<Commentary> commentaries;
     private int counter;
 
-    public Movie(Long id, String name, String year) {
-        this.id = id;
-        this.name = name;
+    public Movie(String iMoBid, String title, String year) {
+        this.iMoBid = iMoBid;
+        this.title = title;
         this.year = year;
     }
 

@@ -10,14 +10,16 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CommentaryDTO {
 
+    private Long id;
     private String userName;
     private String movieName;
     private String commentary;
     private Float score;
 
     public CommentaryDTO(Commentary commentary){
+        this.id = commentary.getId();
         this.userName = commentary.getUser().getUserName();
-        this.movieName = commentary.getMovie().getName();
+        this.movieName = commentary.getMovie().getTitle();
         this.commentary = commentary.getCommentary();
         this.score = commentary.getScore();
     }

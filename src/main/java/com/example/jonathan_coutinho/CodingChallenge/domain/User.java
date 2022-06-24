@@ -24,7 +24,7 @@ public class User {
     private int points;
     private UserRole role;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user")
     private List<Commentary> commentaries;
 
     public User(UserDTO userDTO) {
@@ -34,6 +34,7 @@ public class User {
         this.password = userDTO.getPassword();
         this.role = UserRole.LEITOR;
     }
+
 
     public String checkRole(){
         if(this.role == UserRole.MODERADOR){
