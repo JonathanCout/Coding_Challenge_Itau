@@ -13,14 +13,19 @@ import java.util.List;
 public class Movie {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String iMoBid;
     private String title;
     private String year;
-    private float score;
+
     @OneToMany(mappedBy = "movie")
-    private List<Commentary> commentaries;
-    private int counter;
+    private List<Comment> commentaries;
+
+    @OneToMany(mappedBy = "movie")
+    private List<Score> scores;
+    private Float score;
+    private Integer counter;
 
     public Movie(String iMoBid, String title, String year) {
         this.iMoBid = iMoBid;
@@ -28,8 +33,8 @@ public class Movie {
         this.year = year;
     }
 
-    public void updateScore(Commentary commentary){
-        this.setScore(((this.getScore() * this.counter) + commentary.getScore())/(this.getCounter()+1));
-        this.setCounter(this.getCounter() + 1);
+    public void updateScore(Score score){
+        this.setScore(((this.getScore() * this.getCounter()) + score.getScore())/this.getCounter()+1);
+        this.setCounter(this.getCounter()+1);
     }
 }

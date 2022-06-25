@@ -14,21 +14,21 @@ import java.util.Optional;
 public class MovieService {
 
     @Autowired
-    private MovieRepository repository;
+    private MovieRepository movieRepository;
 
     public Movie createMovie(Movie movie){
         validateMovieInfo(movie);
-        Optional<Movie> existingMovie = repository.findByImdbID(movie.getIMoBid());
+        Optional<Movie> existingMovie = movieRepository.findByImdbID(movie.getIMoBid());
         if(existingMovie.isPresent()) throw new BadRequestException("O filme já está cadastrado na nossa base");
-        return repository.save(movie);
+        return movieRepository.save(movie);
     }
     public Optional<Movie> getMovieByImobID(String imobID){
-        Optional<Movie> result = repository.findByImdbID(imobID);
+        Optional<Movie> result = movieRepository.findByImdbID(imobID);
         if(result.isEmpty()) throw new BadRequestException("Nenhum filme foi encontrado com o código fornecido");
-        return repository.findByImdbID(imobID);
+        return movieRepository.findByImdbID(imobID);
     }
     public List<Movie> getMovieByName(String name){
-        List<Movie> result = repository.findByName(name);
+        List<Movie> result = movieRepository.findByName(name);
         if(result.isEmpty()) throw new NotFoundException("Não existem filmes com este nome");
         return result;
     }

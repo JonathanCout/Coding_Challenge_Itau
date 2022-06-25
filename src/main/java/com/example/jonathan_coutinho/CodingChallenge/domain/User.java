@@ -25,7 +25,10 @@ public class User {
     private UserRole role;
 
     @OneToMany(mappedBy = "user")
-    private List<Commentary> commentaries;
+    private List<Comment> commentaries;
+
+    @OneToMany(mappedBy = "user")
+    private List<Score> scores;
 
     public User(UserDTO userDTO) {
         this.id = userDTO.getId();
