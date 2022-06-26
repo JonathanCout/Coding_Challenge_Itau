@@ -32,5 +32,6 @@ public class Score {
         this.score = scoreDTO.getScore();
         this.user = user;
         this.movie = movie;
+        user.pointsHandler();
     }
 }

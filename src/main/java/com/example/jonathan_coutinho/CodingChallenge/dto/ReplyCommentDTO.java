@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -16,11 +18,13 @@ public class ReplyCommentDTO {
     private Long userId;
     private String movieId;
     private String commentary;
+    private LocalDateTime dateNTime;
 
     public ReplyCommentDTO(Comment comment, Long previousId){
         this.previousId = previousId;
         this.userId = comment.getUser().getId();
         this.movieId = comment.getMovie().getIMoBid();
         this.commentary = comment.getComment();
+        this.dateNTime = comment.getDateNTime();
     }
 }

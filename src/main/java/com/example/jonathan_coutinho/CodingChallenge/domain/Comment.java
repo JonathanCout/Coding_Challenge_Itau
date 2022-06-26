@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor
@@ -26,6 +27,7 @@ public class Comment {
     @JoinColumn(name = "movie_id")
     private Movie movie;
     private String comment;
+    private LocalDateTime dateNTime;
     private Long previousId;
     private Integer reaction;
     private boolean isDuplicate;
@@ -34,12 +36,7 @@ public class Comment {
         this.user = user;
         this.movie = movie;
         this.comment = newCommentDTO.getCommentary();
-        user.pointsHandler();
-    }
-
-    public Comment(User user, Movie movie) {
-        this.user = user;
-        this.movie = movie;
+        this.dateNTime = newCommentDTO.getTimeNDate();
         user.pointsHandler();
     }
 
@@ -48,6 +45,7 @@ public class Comment {
         this.movie = movie;
         this.comment = replyCommentDTO.getCommentary();
         this.previousId = replyCommentDTO.getPreviousId();
+        this.dateNTime = replyCommentDTO.getDateNTime();
         user.pointsHandler();
     }
 

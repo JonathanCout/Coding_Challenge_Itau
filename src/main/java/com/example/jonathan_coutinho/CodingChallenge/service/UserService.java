@@ -25,13 +25,19 @@ public class UserService {
         if(existingUser.isPresent()){
             throw new BadRequestException("Este nome de usuário já foi utilizado");
         }
-        return userRepository.save(new User(userDTO));
+        if(existingUser.get().getEmail().equals(userDTO.getEmail())){
+            throw new BadRequestException("Este email já está vincualdo a uma conta");
+        }
+        User newUser = new User(userDTO);
+        newUser.setRole(UserRole.LEITOR);
+        return userRepository.save(newUser);
     }
     public List<User> getAllUsers(){
         List<User> list = userRepository.findAll();
         if(list.isEmpty()) throw new NotFoundException("Nenhum usuário cadastrado");
         return list;
     }
+
     public Optional<User> getUserByName(String name){
         Optional<User> existingUser = userRepository.findByName(name);
         if(existingUser.isEmpty()){
@@ -45,6 +51,7 @@ public class UserService {
     }
 
     public User upgradeUserRole(String provider,String receiver){
+        if(userRepository.findByName(provider).isEmpty()) throw new NotFoundException("Moderador não encontrado");
         if(!userRepository.findByName(provider).get().getRole().equals(UserRole.MODERADOR)){
             throw new NotAuthorizedException("Somente usuários moderadores podem performar essa ação");
         }

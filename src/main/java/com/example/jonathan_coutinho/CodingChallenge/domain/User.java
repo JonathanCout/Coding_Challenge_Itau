@@ -35,7 +35,6 @@ public class User {
         this.userName = userDTO.getUserName();
         this.email = userDTO.getEmail();
         this.password = userDTO.getPassword();
-        this.role = UserRole.LEITOR;
     }
 
 
