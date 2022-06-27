@@ -3,7 +3,6 @@ package com.example.jonathan_coutinho.CodingChallenge.controller;
 import com.example.jonathan_coutinho.CodingChallenge.domain.Score;
 import com.example.jonathan_coutinho.CodingChallenge.dto.ScoreDTO;
 import com.example.jonathan_coutinho.CodingChallenge.service.ScoreService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("score")
 public class ScoreController {
 
-    @Autowired
     private ScoreService scoreService;
 
     @PostMapping

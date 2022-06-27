@@ -21,7 +21,7 @@ public class UserService {
 
     public User createNewUser(UserDTO userDTO){
         validateUserInfo(userDTO);
-        Optional<User> existingUser = userRepository.findByName(userDTO.getUserName());
+        Optional<User> existingUser = userRepository.findByUserName(userDTO.getUserName());
         if(existingUser.isPresent()){
             throw new BadRequestException("Este nome de usuário já foi utilizado");
         }
@@ -39,7 +39,7 @@ public class UserService {
     }
 
     public Optional<User> getUserByName(String name){
-        Optional<User> existingUser = userRepository.findByName(name);
+        Optional<User> existingUser = userRepository.findByUserName(name);
         if(existingUser.isEmpty()){
             throw new NotFoundException("Usuário não encontrado");
         }
@@ -51,11 +51,11 @@ public class UserService {
     }
 
     public User upgradeUserRole(String provider,String receiver){
-        if(userRepository.findByName(provider).isEmpty()) throw new NotFoundException("Moderador não encontrado");
-        if(!userRepository.findByName(provider).get().getRole().equals(UserRole.MODERADOR)){
+        if(userRepository.findByUserName(provider).isEmpty()) throw new NotFoundException("Moderador não encontrado");
+        if(!userRepository.findByUserName(provider).get().getRole().equals(UserRole.MODERADOR)){
             throw new NotAuthorizedException("Somente usuários moderadores podem performar essa ação");
         }
-        Optional<User> newModerator = userRepository.findByName(receiver);
+        Optional<User> newModerator = userRepository.findByUserName(receiver);
         if (newModerator.isEmpty()) throw new NotFoundException("Usuário não encontrado");
 
         newModerator.get().setRole(UserRole.MODERADOR);

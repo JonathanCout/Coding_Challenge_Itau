@@ -15,7 +15,7 @@ public class Movie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String iMoBid;
+    private String imobid;
     private String title;
     private String year;
 
@@ -27,8 +27,8 @@ public class Movie {
     private Float score;
     private Integer counter;
 
-    public Movie(String iMoBid, String title, String year) {
-        this.iMoBid = iMoBid;
+    public Movie(String imobid, String title, String year) {
+        this.imobid = imobid;
         this.title = title;
         this.year = year;
     }

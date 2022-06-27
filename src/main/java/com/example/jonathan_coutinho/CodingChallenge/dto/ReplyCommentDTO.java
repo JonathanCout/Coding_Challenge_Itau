@@ -23,7 +23,7 @@ public class ReplyCommentDTO {
     public ReplyCommentDTO(Comment comment, Long previousId){
         this.previousId = previousId;
         this.userId = comment.getUser().getId();
-        this.movieId = comment.getMovie().getIMoBid();
+        this.movieId = comment.getMovie().getImobid();
         this.commentary = comment.getComment();
         this.dateNTime = comment.getDateNTime();
     }

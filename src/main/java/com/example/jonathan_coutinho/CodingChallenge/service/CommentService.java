@@ -32,7 +32,7 @@ public class CommentService {
 
     public Comment createCommentary(NewCommentDTO newCommentDTO) {
         User user = userRepository.findById(newCommentDTO.getUserId()).orElseThrow(() -> new NotFoundException("Usuário não encontrado."));
-        Movie movie = movieRepository.findByImdbID(newCommentDTO.getMovieId()).orElseThrow(() -> new NotFoundException("Filme não encontrado."));
+        Movie movie = movieRepository.findByImobid(newCommentDTO.getMovieId()).orElseThrow(() -> new NotFoundException("Filme não encontrado."));
         if(user.getRole().equals(UserRole.LEITOR)) throw
                 new NotAuthorizedException("Usuários Leitores não podem postar comentários");
         return commentRepository.save(new Comment(newCommentDTO,user,movie));
@@ -40,7 +40,7 @@ public class CommentService {
 
     public Comment replyCommentary(ReplyCommentDTO replyCommentDTO){
         User user = userRepository.findById(replyCommentDTO.getUserId()).orElseThrow(() -> new NotFoundException("Usuário não encontrado."));
-        Movie movie = movieRepository.findByImdbID(replyCommentDTO.getMovieId()).orElseThrow(() -> new NotFoundException("Filme não encontrado."));
+        Movie movie = movieRepository.findByImobid(replyCommentDTO.getMovieId()).orElseThrow(() -> new NotFoundException("Filme não encontrado."));
         if(user.getRole().equals(UserRole.LEITOR)) throw
                 new NotAuthorizedException("Usuários Leitores não podem postar comentários");
         user.pointsHandler();
@@ -79,7 +79,7 @@ public class CommentService {
     }
 
     public Comment updateReaction(Long id, String userName, Integer reaction){
-        Optional<User> user = userRepository.findByName(userName);
+        Optional<User> user = userRepository.findByUserName(userName);
         if(user.isEmpty()) throw new NotFoundException("Usuário não encontrado");
         if(user.get().getRole().equals(UserRole.BASICO) || user.get().getRole().equals(UserRole.LEITOR)){
             throw new NotAuthorizedException("Somente usuários Avançados e Moderadores podem reagir a comentários");

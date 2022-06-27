@@ -19,6 +19,6 @@ public class ScoreDTO {
         this.id = score.getId();
         this.score = score.getScore();
         this.userName = score.getUser().getUserName();
-        this.movieId = score.getMovie().getIMoBid();
+        this.movieId = score.getMovie().getImobid();
     }
 }
