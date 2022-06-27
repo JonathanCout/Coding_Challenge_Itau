@@ -35,6 +35,7 @@ public class UserService {
         newUser.setCommentaries(new ArrayList<>());
         return userRepository.save(newUser);
     }
+
     public List<User> getAllUsers(){
         List<User> list = userRepository.findAll();
         if(list.isEmpty()) throw new NotFoundException("Nenhum usuário cadastrado");
@@ -46,6 +47,12 @@ public class UserService {
         if(existingUser.isEmpty()){
             throw new NotFoundException("Usuário não encontrado");
         }
+        return existingUser.get();
+    }
+
+    public User getUserByEmail(String email){
+        Optional<User> existingUser = userRepository.findByEmail(email);
+        if(existingUser.isEmpty()) throw new NotFoundException("Usuário não encontrado");
         return existingUser.get();
     }
 

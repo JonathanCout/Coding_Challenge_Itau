@@ -3,6 +3,7 @@ package com.example.jonathan_coutinho.CodingChallenge.controller;
 import com.example.jonathan_coutinho.CodingChallenge.domain.Movie;
 import com.example.jonathan_coutinho.CodingChallenge.service.MovieService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
@@ -21,6 +22,7 @@ public class MovieController {
     @Autowired
     private MovieService movieService;
 
+    @ApiOperation("Encontra um filme usando a id do imdb e adiciona o filme para o banco de dados")
     @GetMapping("/{id}")
     public ResponseEntity<Movie> getMovieById(@PathVariable String id) {
         HttpResponse<JsonNode> response = Unirest.get("http://www.omdbapi.com/?apikey=c9cee5da&i={movieId}")
