@@ -18,14 +18,18 @@ public class MovieService {
 
     public Movie createMovie(Movie movie){
         validateMovieInfo(movie);
-        Optional<Movie> existingMovie = movieRepository.findByImobid(movie.getImobid());
-        if(existingMovie.isPresent()) throw new BadRequestException("O filme já está cadastrado na nossa base");
+        Optional<Movie> existingMovie = movieRepository.findByImdbid(movie.getImdbid());
+        if(existingMovie.isPresent()){
+            return existingMovie.get();
+        }
+        movie.setCounter(0);
+        movie.setScore(0.0F);
         return movieRepository.save(movie);
     }
-    public Optional<Movie> getMovieByImobID(String imobID){
-        Optional<Movie> result = movieRepository.findByImobid(imobID);
+    public Optional<Movie> getMovieByImdbID(String imodID){
+        Optional<Movie> result = movieRepository.findByImdbid(imodID);
         if(result.isEmpty()) throw new BadRequestException("Nenhum filme foi encontrado com o código fornecido");
-        return movieRepository.findByImobid(imobID);
+        return movieRepository.findByImdbid(imodID);
     }
     public List<Movie> getMovieByName(String name){
         List<Movie> result = movieRepository.findByTitle(name);
@@ -34,7 +38,7 @@ public class MovieService {
     }
 
     public void validateMovieInfo(Movie movie){
-        if(movie.getImobid().isBlank() || movie.getImobid() == null ||
+        if(movie.getImdbid().isBlank() || movie.getImdbid() == null ||
                 movie.getTitle().isBlank() || movie.getTitle() == null ||
                 movie.getYear().isBlank() || movie.getYear() == null)
             throw new BadRequestException("Existem dados faltantes do filme");

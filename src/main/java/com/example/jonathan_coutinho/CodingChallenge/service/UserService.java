@@ -10,6 +10,7 @@ import com.example.jonathan_coutinho.CodingChallenge.service.exceptions.NotFound
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,13 +24,15 @@ public class UserService {
         validateUserInfo(userDTO);
         Optional<User> existingUser = userRepository.findByUserName(userDTO.getUserName());
         if(existingUser.isPresent()){
+            if(existingUser.get().getEmail().equals(userDTO.getEmail())){
+                throw new BadRequestException("Este email já está vincualdo a uma conta");
+            }
             throw new BadRequestException("Este nome de usuário já foi utilizado");
         }
-        if(existingUser.get().getEmail().equals(userDTO.getEmail())){
-            throw new BadRequestException("Este email já está vincualdo a uma conta");
-        }
+
         User newUser = new User(userDTO);
         newUser.setRole(UserRole.LEITOR);
+        newUser.setCommentaries(new ArrayList<>());
         return userRepository.save(newUser);
     }
     public List<User> getAllUsers(){
@@ -38,12 +41,12 @@ public class UserService {
         return list;
     }
 
-    public Optional<User> getUserByName(String name){
+    public User getUserByName(String name){
         Optional<User> existingUser = userRepository.findByUserName(name);
         if(existingUser.isEmpty()){
             throw new NotFoundException("Usuário não encontrado");
         }
-        return existingUser;
+        return existingUser.get();
     }
 
     public User getUserById(Long id){
@@ -72,5 +75,12 @@ public class UserService {
                 userDTO.getPassword().isBlank() || userDTO.getPassword() == null){
             throw new BadRequestException("Os dados informados possuem campos faltantes");
         }
+    }
+
+    public User buffPoints(String username){
+        User user = userRepository.findByUserName(username).orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+        user.setPoints(user.getPoints() + 21);
+        user.pointsHandler();
+        return userRepository.save(user);
     }
 }

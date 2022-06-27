@@ -25,11 +25,16 @@ public class ScoreService {
         User user = userRepository.findByUserName(scoreDTO.getUserName()).orElseThrow(() ->
                 new NotFoundException("Usuario não encontrado"));
 
-        Movie movie = movieRepository.findByImobid(scoreDTO.getMovieId()).orElseThrow(() ->
+        Movie movie = movieRepository.findByImdbid(scoreDTO.getMovieId()).orElseThrow(() ->
                 new NotFoundException("Filme não encontrado"));
 
         Score score = new Score(scoreDTO,user,movie);
+
         movie.updateScore(score);
+        movieRepository.save(movie);
+
+        user.pointsHandler();
+        userRepository.save(user);
 
         return scoreRepository.save(score);
     }

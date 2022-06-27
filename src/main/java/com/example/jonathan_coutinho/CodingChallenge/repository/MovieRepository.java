@@ -10,6 +10,6 @@ import java.util.Optional;
 @Repository
 public interface MovieRepository extends JpaRepository<Movie,Long> {
 
-    Optional<Movie> findByImobid(String imobID);
+    Optional<Movie> findByImdbid(String imdbID);
     List<Movie> findByTitle(String name);
 }

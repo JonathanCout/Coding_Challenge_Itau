@@ -32,19 +32,32 @@ public class CommentService {
 
     public Comment createCommentary(NewCommentDTO newCommentDTO) {
         User user = userRepository.findById(newCommentDTO.getUserId()).orElseThrow(() -> new NotFoundException("Usuário não encontrado."));
-        Movie movie = movieRepository.findByImobid(newCommentDTO.getMovieId()).orElseThrow(() -> new NotFoundException("Filme não encontrado."));
+        Movie movie = movieRepository.findByImdbid(newCommentDTO.getMovieId()).orElseThrow(() -> new NotFoundException("Filme não encontrado."));
         if(user.getRole().equals(UserRole.LEITOR)) throw
                 new NotAuthorizedException("Usuários Leitores não podem postar comentários");
-        return commentRepository.save(new Comment(newCommentDTO,user,movie));
+        Comment comment = new Comment(newCommentDTO,user,movie);
+        comment.setDuplicate(false);
+        comment.setReaction(0);
+
+        user.pointsHandler();
+        userRepository.save(user);
+
+        return commentRepository.save(comment);
     }
 
     public Comment replyCommentary(ReplyCommentDTO replyCommentDTO){
         User user = userRepository.findById(replyCommentDTO.getUserId()).orElseThrow(() -> new NotFoundException("Usuário não encontrado."));
-        Movie movie = movieRepository.findByImobid(replyCommentDTO.getMovieId()).orElseThrow(() -> new NotFoundException("Filme não encontrado."));
+        Movie movie = movieRepository.findByImdbid(replyCommentDTO.getMovieId()).orElseThrow(() -> new NotFoundException("Filme não encontrado."));
         if(user.getRole().equals(UserRole.LEITOR)) throw
                 new NotAuthorizedException("Usuários Leitores não podem postar comentários");
         user.pointsHandler();
-        return commentRepository.save(new Comment(replyCommentDTO,user,movie));
+        Comment comment = new Comment(replyCommentDTO,user,movie);
+        comment.setDuplicate(false);
+
+        user.pointsHandler();
+        userRepository.save(user);
+
+        return commentRepository.save(comment);
     }
 
     public List<CommentDTO> getComment(Long id){
@@ -68,8 +81,8 @@ public class CommentService {
         return commentaries.stream().map(CommentDTO::new).collect(Collectors.toList());
     }
 
-    public List<CommentDTO> getCommentariesByMovie(Long id){
-        Movie movie = movieRepository.findById(id).orElseThrow(() -> new NotFoundException("Filme não encontrado."));
+    public List<CommentDTO> getCommentariesByMovie(String imdd){
+        Movie movie = movieRepository.findByImdbid(imdd).orElseThrow(() -> new NotFoundException("Filme não encontrado."));
         List<Comment> commentaries = commentRepository.findAllByMovie(movie);
 
         if(commentaries.isEmpty()){
@@ -78,14 +91,20 @@ public class CommentService {
         return commentaries.stream().map(CommentDTO::new).collect(Collectors.toList());
     }
 
-    public Comment updateReaction(Long id, String userName, Integer reaction){
+    public Comment updateReaction(Long id, String userName, String reaction){
         Optional<User> user = userRepository.findByUserName(userName);
         if(user.isEmpty()) throw new NotFoundException("Usuário não encontrado");
         if(user.get().getRole().equals(UserRole.BASICO) || user.get().getRole().equals(UserRole.LEITOR)){
             throw new NotAuthorizedException("Somente usuários Avançados e Moderadores podem reagir a comentários");
         }
         Comment comment = commentRepository.findById(id).orElseThrow(() -> new NotFoundException("Comentário não encontrado"));
-        comment.setReaction(comment.getReaction() + reaction);
+        if(reaction.equals("like")){
+            comment.setReaction(comment.getReaction() + 1);
+        }
+        if(reaction.equals("dislike")){
+            comment.setReaction(comment.getReaction() - 1);
+        }
+
         return commentRepository.save(comment);
     }
 

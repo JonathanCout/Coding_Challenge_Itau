@@ -1,8 +1,11 @@
 package com.example.jonathan_coutinho.CodingChallenge.domain;
 
 import com.example.jonathan_coutinho.CodingChallenge.dto.ScoreDTO;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -12,6 +15,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class Score {
 
     @Id
@@ -19,10 +23,13 @@ public class Score {
     private Long id;
 
     private Float score;
+
+    @JsonIgnoreProperties(value = {"commentaries","scores"})
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
+    @JsonIgnoreProperties(value = {"commentaries","scores"})
     @ManyToOne
     @JoinColumn(name = "movie_id")
     private Movie movie;
@@ -32,6 +39,5 @@ public class Score {
         this.score = scoreDTO.getScore();
         this.user = user;
         this.movie = movie;
-        user.pointsHandler();
     }
 }

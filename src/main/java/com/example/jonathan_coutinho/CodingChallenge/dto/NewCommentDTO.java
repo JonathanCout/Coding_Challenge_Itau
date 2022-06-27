@@ -19,7 +19,7 @@ public class NewCommentDTO {
 
     public NewCommentDTO(Comment comment){
         this.userId = comment.getUser().getId();
-        this.movieId = comment.getMovie().getImobid();
+        this.movieId = comment.getMovie().getImdbid();
         this.commentary = comment.getComment();
         this.timeNDate = comment.getDateNTime();
     }
