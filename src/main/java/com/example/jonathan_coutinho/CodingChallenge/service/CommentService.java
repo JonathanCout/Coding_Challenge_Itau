@@ -13,7 +13,7 @@ import com.example.jonathan_coutinho.CodingChallenge.repository.UserRepository;
 import com.example.jonathan_coutinho.CodingChallenge.service.exceptions.BadRequestException;
 import com.example.jonathan_coutinho.CodingChallenge.service.exceptions.NotAuthorizedException;
 import com.example.jonathan_coutinho.CodingChallenge.service.exceptions.NotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,14 +21,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class CommentService {
 
-    @Autowired
-    private CommentRepository commentRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private MovieRepository movieRepository;
+
+    private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
+    private final MovieRepository movieRepository;
 
     public Comment createCommentary(NewCommentDTO newCommentDTO) {
         User user = userRepository.findById(newCommentDTO.getUserId()).orElseThrow(() -> new NotFoundException("Usuário não encontrado."));
@@ -92,7 +91,7 @@ public class CommentService {
     }
 
     public Comment updateReaction(Long id, String userName, String reaction){
-        Optional<User> user = userRepository.findByUserName(userName);
+        Optional<User> user = userRepository.findByUsername(userName);
         if(user.isEmpty()) throw new NotFoundException("Usuário não encontrado");
         if(user.get().getRole().equals(UserRole.BASICO) || user.get().getRole().equals(UserRole.LEITOR)){
             throw new NotAuthorizedException("Somente usuários Avançados e Moderadores podem reagir a comentários");

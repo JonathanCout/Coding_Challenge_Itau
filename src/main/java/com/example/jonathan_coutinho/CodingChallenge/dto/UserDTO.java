@@ -11,12 +11,12 @@ import lombok.Setter;
 @NoArgsConstructor
 public class UserDTO {
 
-    private String userName;
+    private String username;
     private String email;
     private String password;
 
     public UserDTO(User user){
-        this.userName = user.getUserName();
+        this.username = user.getUsername();
         this.email = user.getEmail();
         this.password = user.getPassword();
     }

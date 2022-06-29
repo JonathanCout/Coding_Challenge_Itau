@@ -39,9 +39,4 @@ public class CodingChallengeApplication {
 				.version("0.5")
 				.build();
 	}
-
-	@Bean
-	public PasswordEncoder passwordEncoder(){
-		return new BCryptPasswordEncoder(10);
-	}
 }

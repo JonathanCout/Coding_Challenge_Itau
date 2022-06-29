@@ -12,13 +12,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpHeaders.SET_COOKIE;
+import static org.springframework.http.HttpStatus.OK;
 
 @RestController
+@RequestMapping("user")
 @Api(tags = {"Usuário"})
 @Tag(name = "Usuário",description = "Endpoint criado para controlar criações e busca de usuários")
 @RequiredArgsConstructor
@@ -40,14 +47,31 @@ public class UserController {
                 .build();
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<UserDTO> login(@RequestBody Map<String,String> credentials) throws IOException {
+
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = (User) authenticationService.loadUserByUsername(username);
+        List<ResponseCookie> jwtCookies =
+                authenticationService.createJWTCookies(user.getUsername(),
+                        user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
+        UserDTO responseData = new UserDTO(user);
+
+        return ResponseEntity.status(OK)
+                .header(SET_COOKIE,jwtCookies.get(0).toString())
+                .header(SET_COOKIE,jwtCookies.get(1).toString())
+                .body(responseData);
+
+    }
+
     @ApiOperation("Encontra um usuário a partir do seu username.")
-    @GetMapping("/{username}")
+    @GetMapping("/username={username}")
     public ResponseEntity<User> getUserByUsername(@PathVariable String username){
         return ResponseEntity.ok(userService.getUserByName(username));
     }
 
     @ApiOperation("Encontra um usuário a partir do email dele.")
-    @GetMapping("/{email}")
+    @GetMapping("/email={email}")
     public ResponseEntity<User> getUserByEmail(@PathVariable String email){
         return ResponseEntity.ok(userService.getUserByEmail(email));
     }

@@ -11,13 +11,13 @@ import lombok.Setter;
 public class CommentDTO {
 
     private Long id;
-    private String userName;
+    private String username;
     private String movieName;
     private String comment;
 
     public CommentDTO(Comment comment){
         this.id = comment.getId();
-        this.userName = comment.getUser().getUserName();
+        this.username = comment.getUser().getUsername();
         this.movieName = comment.getMovie().getTitle();
         this.comment = comment.getComment();
     }

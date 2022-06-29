@@ -22,7 +22,7 @@ public class ScoreService {
     private MovieRepository movieRepository;
 
     public Score createScore (ScoreDTO scoreDTO){
-        User user = userRepository.findByUserName(scoreDTO.getUserName()).orElseThrow(() ->
+        User user = userRepository.findByUsername(scoreDTO.getUsername()).orElseThrow(() ->
                 new NotFoundException("Usuario não encontrado"));
 
         Movie movie = movieRepository.findByImdbid(scoreDTO.getMovieId()).orElseThrow(() ->

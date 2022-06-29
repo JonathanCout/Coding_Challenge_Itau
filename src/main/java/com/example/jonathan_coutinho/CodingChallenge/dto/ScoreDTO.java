@@ -12,13 +12,13 @@ public class ScoreDTO {
 
     private Long id;
     private Float score;
-    private String userName;
+    private String username;
     private String movieId;
 
     public ScoreDTO(Score score){
         this.id = score.getId();
         this.score = score.getScore();
-        this.userName = score.getUser().getUserName();
+        this.username = score.getUser().getUsername();
         this.movieId = score.getMovie().getImdbid();
     }
 }

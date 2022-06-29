@@ -42,7 +42,7 @@ public class AuthenticationService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUserName(username).orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+        return userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
     }
 
     public String refreshAccessToken(HttpServletRequest request){

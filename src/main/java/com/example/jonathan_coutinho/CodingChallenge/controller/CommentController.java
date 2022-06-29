@@ -8,10 +8,9 @@ import com.example.jonathan_coutinho.CodingChallenge.service.CommentService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,11 +19,10 @@ import java.util.List;
 @RequestMapping("/comment")
 @Api(tags = {"Comentários"})
 @Tag(name = "Comentários", description = "Endpoint para controle de comentários feitos pelos usuários")
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@RequiredArgsConstructor
 public class CommentController {
 
-    @Autowired
-    private CommentService commentService;
+    private final CommentService commentService;
 
     @ApiOperation("Criação de comentários")
     @PostMapping
@@ -41,7 +39,7 @@ public class CommentController {
 
     @ApiOperation("Targetar um comentário como duplicado")
     @PatchMapping("/moderation/user={userId}/comment={commentId}")
-    @PreAuthorize("hasRole('ROLE_MODERADOR)")
+    @PreAuthorize("hasRole('ROLE_MODERADOR')")
     public ResponseEntity<Comment> flagAsDuplicate(@PathVariable Long userId,@PathVariable Long commentId){
         return ResponseEntity.ok(commentService.flagAsDuplicateComment(commentId,userId));
     }

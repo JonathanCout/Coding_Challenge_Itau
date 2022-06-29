@@ -12,20 +12,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class UserService {
 
+    public final int MAX_FAILED_ATTMEPTS = 4;
+    public final long MAX_LOCKED_TIME = 20*60*1000;
+
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+
     public User createNewUser(UserDTO userDTO){
         validateUserInfo(userDTO);
-        Optional<User> existingUser = userRepository.findByUserName(userDTO.getUserName());
+        Optional<User> existingUser = userRepository.findByUsername(userDTO.getUsername());
         if(existingUser.isPresent()){
             if(existingUser.get().getEmail().equals(userDTO.getEmail())){
                 throw new BadRequestException("Este email já está vincualdo a uma conta");
@@ -46,7 +51,7 @@ public class UserService {
     }
 
     public User getUserByName(String name){
-        Optional<User> existingUser = userRepository.findByUserName(name);
+        Optional<User> existingUser = userRepository.findByUsername(name);
         if(existingUser.isEmpty()){
             throw new NotFoundException("Usuário não encontrado");
         }
@@ -60,7 +65,7 @@ public class UserService {
     }
 
     public List<Comment> getAllCommentsOfUser(String username){
-        Optional<User> existingUser = userRepository.findByUserName(username);
+        Optional<User> existingUser = userRepository.findByUsername(username);
         if(existingUser.isEmpty()){
             throw new NotFoundException("Usuário não encontrado");
         }
@@ -72,11 +77,11 @@ public class UserService {
     }
 
     public User upgradeUserRole(String provider,String receiver){
-        if(userRepository.findByUserName(provider).isEmpty()) throw new NotFoundException("Moderador não encontrado");
-        if(!userRepository.findByUserName(provider).get().getRole().equals(UserRole.MODERADOR)){
+        if(userRepository.findByUsername(provider).isEmpty()) throw new NotFoundException("Moderador não encontrado");
+        if(!userRepository.findByUsername(provider).get().getRole().equals(UserRole.MODERADOR)){
             throw new NotAuthorizedException("Somente usuários moderadores podem performar essa ação");
         }
-        Optional<User> newModerator = userRepository.findByUserName(receiver);
+        Optional<User> newModerator = userRepository.findByUsername(receiver);
         if (newModerator.isEmpty()) throw new NotFoundException("Usuário não encontrado");
 
         newModerator.get().setRole(UserRole.MODERADOR);
@@ -88,7 +93,7 @@ public class UserService {
     }
 
     public void validateUserInfo(UserDTO userDTO){
-        if(userDTO.getUserName().isBlank() || userDTO.getUserName() == null ||
+        if(userDTO.getUsername().isBlank() || userDTO.getUsername() == null ||
                 userDTO.getEmail().isBlank() || userDTO.getEmail() == null ||
                 userDTO.getPassword().isBlank() || userDTO.getPassword() == null){
             throw new BadRequestException("Os dados informados possuem campos faltantes");
@@ -105,9 +110,34 @@ public class UserService {
     }
 
     public User buffPoints(String username){
-        User user = userRepository.findByUserName(username).orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
         user.setPoints(user.getPoints() + 21);
         user.pointsHandler();
         return userRepository.save(user);
+    }
+
+    public void updateUserFailedAttempts(String username){
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+        int updatedFailedAttempts = user.getFailedAttempts() + 1;
+        userRepository.updateFailedAttempts(user.getUsername(),updatedFailedAttempts);
+    }
+
+    public void lockUserAccount(String username){
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+        user.setAccountNonLocked(false);
+        user.setLock_time(new Date());
+        userRepository.save(user);
+    }
+
+    public void unlockUserAccount(String username) {
+        long timeNowInMilli = System.currentTimeMillis();
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+
+        if (timeNowInMilli - user.getLock_time().getTime() > MAX_LOCKED_TIME) {
+            user.setFailedAttempts(0);
+            user.setAccountNonLocked(true);
+            user.setLock_time(null);
+            userRepository.save(user);
+        }
     }
 }
