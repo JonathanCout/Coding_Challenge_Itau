@@ -1,5 +1,6 @@
 package com.example.jonathan_coutinho.CodingChallenge.service;
 
+import com.example.jonathan_coutinho.CodingChallenge.domain.Comment;
 import com.example.jonathan_coutinho.CodingChallenge.domain.Movie;
 import com.example.jonathan_coutinho.CodingChallenge.repository.MovieRepository;
 import com.example.jonathan_coutinho.CodingChallenge.service.exceptions.BadRequestException;
@@ -31,10 +32,17 @@ public class MovieService {
         if(result.isEmpty()) throw new BadRequestException("Nenhum filme foi encontrado com o código fornecido");
         return movieRepository.findByImdbid(imodID);
     }
+
     public List<Movie> getMovieByName(String name){
         List<Movie> result = movieRepository.findByTitle(name);
         if(result.isEmpty()) throw new NotFoundException("Não existem filmes com este nome");
         return result;
+    }
+
+    public List<Comment> getAllComments(String imodID){
+        Optional<Movie> result = movieRepository.findByImdbid(imodID);
+        if(result.isEmpty()) throw new BadRequestException("Nenhum filme foi encontrado com o código fornecido");
+        return result.get().getCommentaries();
     }
 
     public void validateMovieInfo(Movie movie){

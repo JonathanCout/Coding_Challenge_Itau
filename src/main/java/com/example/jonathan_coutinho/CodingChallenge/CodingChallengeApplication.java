@@ -2,7 +2,10 @@ package com.example.jonathan_coutinho.CodingChallenge;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
@@ -12,6 +15,7 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
 @SpringBootApplication
+@EnableCaching
 public class CodingChallengeApplication {
 
 	public static void main(String[] args) {
@@ -34,5 +38,10 @@ public class CodingChallengeApplication {
 				.description("Api do projeto de críticas e notas de filmes realizado para o Bootcamp Dev Experts do Itau")
 				.version("0.5")
 				.build();
+	}
+
+	@Bean
+	public PasswordEncoder passwordEncoder(){
+		return new BCryptPasswordEncoder(10);
 	}
 }

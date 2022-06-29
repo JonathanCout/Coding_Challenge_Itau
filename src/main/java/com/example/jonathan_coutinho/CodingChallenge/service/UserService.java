@@ -1,5 +1,6 @@
 package com.example.jonathan_coutinho.CodingChallenge.service;
 
+import com.example.jonathan_coutinho.CodingChallenge.domain.Comment;
 import com.example.jonathan_coutinho.CodingChallenge.domain.User;
 import com.example.jonathan_coutinho.CodingChallenge.domain.UserRole;
 import com.example.jonathan_coutinho.CodingChallenge.dto.UserDTO;
@@ -8,9 +9,9 @@ import com.example.jonathan_coutinho.CodingChallenge.service.exceptions.BadReque
 import com.example.jonathan_coutinho.CodingChallenge.service.exceptions.NotAuthorizedException;
 import com.example.jonathan_coutinho.CodingChallenge.service.exceptions.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +20,8 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public User createNewUser(UserDTO userDTO){
         validateUserInfo(userDTO);
@@ -29,10 +32,10 @@ public class UserService {
             }
             throw new BadRequestException("Este nome de usuário já foi utilizado");
         }
-
+        Util.validatePassword(userDTO.getPassword());
         User newUser = new User(userDTO);
-        newUser.setRole(UserRole.LEITOR);
-        newUser.setCommentaries(new ArrayList<>());
+
+        setDefaultInfo(newUser);
         return userRepository.save(newUser);
     }
 
@@ -54,6 +57,14 @@ public class UserService {
         Optional<User> existingUser = userRepository.findByEmail(email);
         if(existingUser.isEmpty()) throw new NotFoundException("Usuário não encontrado");
         return existingUser.get();
+    }
+
+    public List<Comment> getAllCommentsOfUser(String username){
+        Optional<User> existingUser = userRepository.findByUserName(username);
+        if(existingUser.isEmpty()){
+            throw new NotFoundException("Usuário não encontrado");
+        }
+        return existingUser.get().getCommentaries();
     }
 
     public User getUserById(Long id){
@@ -82,6 +93,15 @@ public class UserService {
                 userDTO.getPassword().isBlank() || userDTO.getPassword() == null){
             throw new BadRequestException("Os dados informados possuem campos faltantes");
         }
+    }
+
+    public void setDefaultInfo(User user){
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setAccountNonExpired(true);
+        user.setAccountNonLocked(true);
+        user.setCredentialsNonExpired(true);
+        user.setEnabled(true);
+        user.setRole(UserRole.LEITOR);
     }
 
     public User buffPoints(String username){

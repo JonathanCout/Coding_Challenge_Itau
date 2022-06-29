@@ -10,6 +10,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +20,7 @@ import java.util.List;
 @RequestMapping("/comment")
 @Api(tags = {"Comentários"})
 @Tag(name = "Comentários", description = "Endpoint para controle de comentários feitos pelos usuários")
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class CommentController {
 
     @Autowired
@@ -37,7 +40,8 @@ public class CommentController {
     }
 
     @ApiOperation("Targetar um comentário como duplicado")
-    @PatchMapping("/user={userId}/comment={commentId}")
+    @PatchMapping("/moderation/user={userId}/comment={commentId}")
+    @PreAuthorize("hasRole('ROLE_MODERADOR)")
     public ResponseEntity<Comment> flagAsDuplicate(@PathVariable Long userId,@PathVariable Long commentId){
         return ResponseEntity.ok(commentService.flagAsDuplicateComment(commentId,userId));
     }
@@ -48,20 +52,9 @@ public class CommentController {
         return ResponseEntity.ok(commentService.getComment(id));
     }
 
-    @ApiOperation("Buscar todos os comentários de um usuário específico")
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<CommentDTO>> getCommentsByUser(@PathVariable Long id){
-        return ResponseEntity.ok(commentService.getCommentariesByUser(id));
-    }
-
-    @ApiOperation("Buscar todos os comentários de um filme específico")
-    @GetMapping("/movie/{movieId}")
-    public ResponseEntity<List<CommentDTO>> getCommentsByMovie(@PathVariable String movieId){
-        return ResponseEntity.ok(commentService.getCommentariesByMovie(movieId));
-    }
-
     @ApiOperation("Atualizar o número de 'curtidas' de um comentário")
-    @PatchMapping("/{id}/{userName}-{reaction}")
+    @PatchMapping("/adv/cmmt={id}/user={userName}-rct={reaction}")
+    @PreAuthorize("hasAnyRole('ROLE_AVANCADO','ROLE_MODERADOR')")
     public ResponseEntity<Comment> patchReaction(@PathVariable Long id, @PathVariable String userName, @PathVariable String reaction){
         return ResponseEntity.ok(commentService.updateReaction(id,userName,reaction));
     }

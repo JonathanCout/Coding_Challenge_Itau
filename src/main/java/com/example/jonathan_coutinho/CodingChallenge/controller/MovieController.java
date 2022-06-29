@@ -1,5 +1,6 @@
 package com.example.jonathan_coutinho.CodingChallenge.controller;
 
+import com.example.jonathan_coutinho.CodingChallenge.domain.Comment;
 import com.example.jonathan_coutinho.CodingChallenge.domain.Movie;
 import com.example.jonathan_coutinho.CodingChallenge.service.MovieService;
 import io.swagger.annotations.Api;
@@ -12,6 +13,8 @@ import kong.unirest.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("movie")
@@ -35,5 +38,11 @@ public class MovieController {
         movieService.createMovie(newMovie);
 
         return ResponseEntity.ok(movieService.getMovieByImdbID(id).get());
+    }
+
+    @ApiOperation("Encontrar somente os comentários para um filme específico")
+    @GetMapping("/{id}-comments")
+    public ResponseEntity<List<Comment>> getAllCommentsById(@PathVariable String id){
+        return ResponseEntity.ok(movieService.getAllComments(id));
     }
 }
