@@ -9,7 +9,6 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.Date;
@@ -54,9 +53,9 @@ public class User implements UserDetails {
         this.password = userDTO.getPassword();
     }
 
-    public String checkRole(){
+    public void checkRole(){
         if(this.getRole() == UserRole.MODERADOR){
-            return this.getRole().name();
+            return;
         }
         if(this.getPoints() >= 1000){
             this.setRole(UserRole.MODERADOR);
@@ -65,7 +64,6 @@ public class User implements UserDetails {
         } else if (this.getPoints() >= 20){
             this.setRole(UserRole.BASICO);
         }
-        return this.getRole().name();
     }
     public void pointsHandler(){
         this.setPoints(this.getPoints()+1);
@@ -84,7 +82,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return username;
     }
 
     @Override

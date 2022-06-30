@@ -15,12 +15,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ScoreService {
 
-
     private final ScoreRepository scoreRepository;
     private final UserRepository userRepository;
     private final MovieRepository movieRepository;
     private final MovieAPIService movieService;
-
 
     public Score createScore (ScoreDTO scoreDTO){
         User user = userRepository.findByUsername(scoreDTO.getUsername()).orElseThrow(() ->

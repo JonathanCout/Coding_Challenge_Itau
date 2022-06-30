@@ -14,13 +14,13 @@ public class NewCommentDTO {
 
     private Long userId;
     private String movieId;
-    private String commentary;
+    private String comment;
     private LocalDateTime timeNDate;
 
     public NewCommentDTO(Comment comment){
         this.userId = comment.getUser().getId();
         this.movieId = comment.getMovie().getImdbid();
-        this.commentary = comment.getComment();
+        this.comment = comment.getComment();
         this.timeNDate = comment.getDateNTime();
     }
 }

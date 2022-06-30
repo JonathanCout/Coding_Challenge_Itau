@@ -22,7 +22,7 @@ public class MovieAPIService {
 
     public Movie getMovieFromAPIWithTitle(String title,String year){
         HttpResponse<JsonNode> response = Unirest.get("http://www.omdbapi.com/?apikey=c9cee5da&t={movieTitle}&y={movieYear}")
-                .routeParam("movieId", title)
+                .routeParam("movieTitle", title)
                 .routeParam("movieYear", year)
                 .asJson();
 

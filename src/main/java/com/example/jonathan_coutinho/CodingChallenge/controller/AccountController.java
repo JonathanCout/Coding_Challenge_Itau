@@ -13,12 +13,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -44,19 +42,18 @@ public class AccountController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserDTO> login() throws IOException {
+    public ResponseEntity<User> login() throws IOException {
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = (User) authenticationService.loadUserByUsername(username);
         List<String> jwtTokens =
                 authenticationService.createJWTTokens(user.getUsername(),
                         user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
-        UserDTO responseData = new UserDTO(user);
 
         return ResponseEntity.status(OK)
                 .header(AUTHORIZATION,jwtTokens.get(0))
                 .header(AUTHORIZATION,jwtTokens.get(1))
-                .body(responseData);
+                .body(user);
 
     }
 

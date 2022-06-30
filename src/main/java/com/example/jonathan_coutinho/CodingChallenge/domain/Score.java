@@ -1,7 +1,6 @@
 package com.example.jonathan_coutinho.CodingChallenge.domain;
 
 import com.example.jonathan_coutinho.CodingChallenge.dto.ScoreDTO;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

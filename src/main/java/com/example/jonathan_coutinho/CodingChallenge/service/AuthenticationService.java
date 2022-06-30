@@ -20,7 +20,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.time.Instant;
@@ -107,6 +106,5 @@ public class AuthenticationService implements UserDetailsService {
                                 HttpServletResponse response) {
 
         return new UserDTO(findAuthenticatedUser(request,response));
-
     }
 }

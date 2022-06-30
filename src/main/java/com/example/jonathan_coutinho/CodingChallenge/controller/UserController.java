@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -22,25 +23,25 @@ public class UserController {
     private final UserService userService;
 
     @ApiOperation("Encontra um usuário a partir do seu username.")
-    @GetMapping("/username={username}")
+    @GetMapping("/{username}")
     public ResponseEntity<User> getUserByUsername(@PathVariable String username){
-        return ResponseEntity.ok(userService.getUserByName(username));
-    }
-
-    @ApiOperation("Encontra um usuário a partir do email dele.")
-    @GetMapping("/email={email}")
-    public ResponseEntity<User> getUserByEmail(@PathVariable String email){
-        return ResponseEntity.ok(userService.getUserByEmail(email));
+        return ResponseEntity.ok(userService.getUser(username));
     }
 
     @ApiOperation("Retorna a lista completa de comentários feita por um usuário específico")
-    @GetMapping("/{username}-comments")
-    public ResponseEntity<List<Comment>> getAllCommentsByUser(@PathVariable String username){
+    @GetMapping("/comments")
+    public ResponseEntity<List<Comment>> getAllCommentsByUser(@RequestParam String username){
         return ResponseEntity.ok(userService.getAllCommentsOfUser(username));
     }
 
-    @PatchMapping("/{username}")
+    @PutMapping("/{username}")
     public ResponseEntity<User> buffUser(@PathVariable String username){
         return ResponseEntity.ok(userService.buffPoints(username));
+    }
+
+    @PostMapping("/moderation/upgrade")
+    @PreAuthorize("hasRole('ROLE_MODERADOR')")
+    public ResponseEntity<User> upgradeToModerator(@RequestParam String provider, @RequestParam String receiver){
+        return ResponseEntity.ok(userService.upgradeUserRole(provider,receiver));
     }
 }

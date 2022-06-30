@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -32,21 +33,22 @@ public class Comment {
     private Movie movie;
     private String comment;
     private LocalDateTime dateNTime;
-    private Long previousId;
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<Long> previousId;
     private Integer reaction;
     private boolean isDuplicate;
 
     public Comment(NewCommentDTO newCommentDTO, User user, Movie movie) {
         this.user = user;
         this.movie = movie;
-        this.comment = newCommentDTO.getCommentary();
+        this.comment = newCommentDTO.getComment();
         this.dateNTime = newCommentDTO.getTimeNDate();
     }
 
     public Comment(ReplyCommentDTO replyCommentDTO, User user, Movie movie){
         this.user = user;
         this.movie = movie;
-        this.comment = replyCommentDTO.getCommentary();
+        this.comment = replyCommentDTO.getComment();
         this.previousId = replyCommentDTO.getPreviousId();
         this.dateNTime = replyCommentDTO.getDateNTime();
     }

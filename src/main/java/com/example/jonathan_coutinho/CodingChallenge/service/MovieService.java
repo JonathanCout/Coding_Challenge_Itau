@@ -18,7 +18,6 @@ public class MovieService {
     private final MovieRepository movieRepository;
     private final MovieAPIService apiService;
 
-
     public Movie createMovie(String id){
         Movie movie = apiService.getMovieFromAPIWithId(id);
         validateMovieInfo(movie);
@@ -35,9 +34,11 @@ public class MovieService {
         Optional<Movie> result = movieRepository.findByTitle(title);
         if (result.isEmpty()){
             Movie newMovie = apiService.getMovieFromAPIWithTitle(title, year);
+            newMovie.setCounter(0);
+            newMovie.setScore(0.0F);
             return movieRepository.save(newMovie);
         }
-        return result.get();
+        return result.orElseThrow(() -> new NotFoundException("Filme não encontrado na API"));
     }
 
     public List<Comment> getAllComments(String imodID){

@@ -33,4 +33,5 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         new ObjectMapper().writeValue(response.getOutputStream(),
                 new ResponseDTO(FAILED, data, "Acesso negado"));
     }
+
 }
