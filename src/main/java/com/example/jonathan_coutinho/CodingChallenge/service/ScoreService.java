@@ -8,25 +8,25 @@ import com.example.jonathan_coutinho.CodingChallenge.repository.MovieRepository;
 import com.example.jonathan_coutinho.CodingChallenge.repository.ScoreRepository;
 import com.example.jonathan_coutinho.CodingChallenge.repository.UserRepository;
 import com.example.jonathan_coutinho.CodingChallenge.service.exceptions.NotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class ScoreService {
 
-    @Autowired
-    private ScoreRepository scoreRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private MovieRepository movieRepository;
+
+    private final ScoreRepository scoreRepository;
+    private final UserRepository userRepository;
+    private final MovieRepository movieRepository;
+    private final MovieAPIService movieService;
+
 
     public Score createScore (ScoreDTO scoreDTO){
         User user = userRepository.findByUsername(scoreDTO.getUsername()).orElseThrow(() ->
                 new NotFoundException("Usuario não encontrado"));
 
-        Movie movie = movieRepository.findByImdbid(scoreDTO.getMovieId()).orElseThrow(() ->
-                new NotFoundException("Filme não encontrado"));
+        Movie movie = movieRepository.findByImdbid(scoreDTO.getMovieId()).orElse(movieService.getMovieFromAPIWithId(scoreDTO.getMovieId()));
 
         Score score = new Score(scoreDTO,user,movie);
 

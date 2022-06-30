@@ -25,6 +25,7 @@ import java.util.Collection;
 
 import static com.example.jonathan_coutinho.CodingChallenge.dto.ResponseDTO.Status.FAILED;
 import static java.util.Arrays.stream;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -34,27 +35,19 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if(request.getServletPath().equals("/login")||request.getServletPath().equals("/signup")||request.getServletPath().equals("/refreshtoken")){
+        if(request.getServletPath().equals("/login")||request.getServletPath().equals("/signup")||request.getServletPath().equals("/refresh_token")){
             filterChain.doFilter(request,response);
         }else {
-            Cookie[] requestCookies = request.getCookies();
-            if(requestCookies == null){
-                filterChain.doFilter(request,response);
-                return;
-            }
-            String token = null;
-            for(Cookie cookie : requestCookies){
-                if(cookie.getName().equals("access_token")) token = cookie.getValue();
-            }
-            if(token == null){
+            String requestTokens = request.getHeader(AUTHORIZATION);
+            if(requestTokens == null){
                 response.setStatus(403);
-                new ObjectMapper().writeValue(response.getOutputStream(), new ResponseDTO(FAILED,"Cookie de acesso não encontrado"));
+                new ObjectMapper().writeValue(response.getOutputStream(), new ResponseDTO(FAILED,"Token de acesso não encontrado"));
                 return;
             }
             try{
                 Algorithm algorithm = Algorithm.HMAC256(secret);
                 JWTVerifier jwtVerifier = JWT.require(algorithm).build();
-                DecodedJWT decodedJWT = jwtVerifier.verify(token);
+                DecodedJWT decodedJWT = jwtVerifier.verify(requestTokens);
                 String username = decodedJWT.getSubject();
                 String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
                 Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();

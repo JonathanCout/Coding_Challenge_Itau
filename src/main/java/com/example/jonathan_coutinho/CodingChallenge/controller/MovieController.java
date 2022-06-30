@@ -2,15 +2,12 @@ package com.example.jonathan_coutinho.CodingChallenge.controller;
 
 import com.example.jonathan_coutinho.CodingChallenge.domain.Comment;
 import com.example.jonathan_coutinho.CodingChallenge.domain.Movie;
+import com.example.jonathan_coutinho.CodingChallenge.service.MovieAPIService;
 import com.example.jonathan_coutinho.CodingChallenge.service.MovieService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kong.unirest.HttpResponse;
-import kong.unirest.JsonNode;
-import kong.unirest.Unirest;
-import kong.unirest.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,24 +17,22 @@ import java.util.List;
 @RequestMapping("movie")
 @Api(tags = {"Filmes"})
 @Tag(name = "Filmes",description = "Endpoint para controlar buscar de filmes")
+@RequiredArgsConstructor
 public class MovieController {
 
-    @Autowired
-    private MovieService movieService;
+    private final MovieAPIService movieAPIService;
+    private final MovieService movieService;
 
     @ApiOperation("Encontra um filme usando a id do imdb e adiciona o filme para o banco de dados")
-    @GetMapping("/{id}")
+    @GetMapping("/imdbID={id}")
     public ResponseEntity<Movie> getMovieById(@PathVariable String id) {
-        HttpResponse<JsonNode> response = Unirest.get("http://www.omdbapi.com/?apikey=c9cee5da&i={movieId}")
-                .routeParam("movieId", id.toString())
-                .asJson();
+        return ResponseEntity.ok(movieAPIService.getMovieFromAPIWithId(id));
+    }
 
-        JSONObject jsonObject = response.getBody().getObject();
-
-        Movie newMovie = new Movie(jsonObject.getString("imdbID"), jsonObject.getString("Title"), jsonObject.getString("Year"));
-        movieService.createMovie(newMovie);
-
-        return ResponseEntity.ok(movieService.getMovieByImdbID(id).get());
+    @ApiOperation("Encontra um filme usando a id do imdb e adiciona o filme para o banco de dados")
+    @GetMapping("/title={title}&year={year}")
+    public ResponseEntity<Movie> getMovieByTitle(@PathVariable String title, @PathVariable(required = false) String year) {
+        return ResponseEntity.ok(movieAPIService.getMovieFromAPIWithTitle(title,year));
     }
 
     @ApiOperation("Encontrar somente os comentários para um filme específico")

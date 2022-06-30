@@ -5,19 +5,22 @@ import com.example.jonathan_coutinho.CodingChallenge.domain.Movie;
 import com.example.jonathan_coutinho.CodingChallenge.repository.MovieRepository;
 import com.example.jonathan_coutinho.CodingChallenge.service.exceptions.BadRequestException;
 import com.example.jonathan_coutinho.CodingChallenge.service.exceptions.NotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class MovieService {
 
-    @Autowired
-    private MovieRepository movieRepository;
+    private final MovieRepository movieRepository;
+    private final MovieAPIService apiService;
 
-    public Movie createMovie(Movie movie){
+
+    public Movie createMovie(String id){
+        Movie movie = apiService.getMovieFromAPIWithId(id);
         validateMovieInfo(movie);
         Optional<Movie> existingMovie = movieRepository.findByImdbid(movie.getImdbid());
         if(existingMovie.isPresent()){
@@ -27,16 +30,14 @@ public class MovieService {
         movie.setScore(0.0F);
         return movieRepository.save(movie);
     }
-    public Optional<Movie> getMovieByImdbID(String imodID){
-        Optional<Movie> result = movieRepository.findByImdbid(imodID);
-        if(result.isEmpty()) throw new BadRequestException("Nenhum filme foi encontrado com o código fornecido");
-        return movieRepository.findByImdbid(imodID);
-    }
 
-    public List<Movie> getMovieByName(String name){
-        List<Movie> result = movieRepository.findByTitle(name);
-        if(result.isEmpty()) throw new NotFoundException("Não existem filmes com este nome");
-        return result;
+    public Movie getMovieByTitle(String title, String year){
+        Optional<Movie> result = movieRepository.findByTitle(title);
+        if (result.isEmpty()){
+            Movie newMovie = apiService.getMovieFromAPIWithTitle(title, year);
+            return movieRepository.save(newMovie);
+        }
+        return result.get();
     }
 
     public List<Comment> getAllComments(String imodID){

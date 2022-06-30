@@ -11,7 +11,7 @@ import com.example.jonathan_coutinho.CodingChallenge.service.exceptions.BadReque
 import com.example.jonathan_coutinho.CodingChallenge.service.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseCookie;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,12 +31,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AuthenticationService implements UserDetailsService {
 
+    @Value("${sdt.security.jwt.secret}")
     private String secret;
     private final UserRepository userRepository;
 
@@ -47,27 +49,19 @@ public class AuthenticationService implements UserDetailsService {
 
     public String refreshAccessToken(HttpServletRequest request){
 
-        Cookie[] cookies = request.getCookies();
-        if(cookies==null) throw new BadRequestException("Erro ao atualizar cookie: nenhum cookie encontrado");
-        Cookie refreshTokenCookie = null;
-        for (Cookie cookie : cookies) {
-            if(cookie.getName().equals("refresh_token")) refreshTokenCookie = cookie;
-        }
-        if (refreshTokenCookie==null) {
-            log.error("Error refreshing access token: unable to find 'refresh_token' cookie");
-            throw new BadRequestException("Erro ao atualizar token de acesso: Não foi encontrado o cookie 'refresh_token'");
-        }
+        String refreshToken = request.getHeader(AUTHORIZATION);
+        if(refreshToken==null) throw new BadRequestException("Erro ao atualizar token: nenhum token encontrado");
+
         try {
-            String refreshToken = refreshTokenCookie.getValue();
             Algorithm algorithm = Algorithm.HMAC256(secret);
             JWTVerifier verifier = JWT.require(algorithm).build();
             DecodedJWT decodedJWT = verifier.verify(refreshToken);
             String username = decodedJWT.getSubject();
-            User user = (User) loadUserByUsername(username);
+            User user = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
             return JWT.create()
                     .withSubject(user.getEmail())
-                    .withClaim("authorities",user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
-                    .withIssuer("digitalbooking")
+                    .withClaim("roles",user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
+                    .withIssuer("codingChallenge")
                     .withIssuedAt(new Date())
                     .withExpiresAt(java.sql.Date.valueOf(LocalDate.now().plusDays(1)))
                     .sign(algorithm);
@@ -82,21 +76,16 @@ public class AuthenticationService implements UserDetailsService {
                                       HttpServletResponse response) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUserName = authentication.getName();
-        log.info("Cookies: {}",request.getCookies());
-        if(request.getCookies()!=null){
-            for(Cookie cookie: request.getCookies()){
-                log.info("Cookie: {}={}",cookie.getName(),cookie.getValue());
-            }
-        }
+        log.info("Tokens: {}",request.getHeader(AUTHORIZATION));
         log.info("Current User Name: {}",currentUserName);
         log.info("Credentials: {}",authentication.getCredentials());
         log.info("Principal: {}",authentication.getPrincipal());
 
-        return userRepository.findByEmail(currentUserName).orElseThrow(() ->
+        return userRepository.findByUsername(currentUserName).orElseThrow(() ->
                 new NotFoundException("Usuário não encontrado"));
     }
 
-    public List<ResponseCookie> createJWTCookies(String subject, List<String> roles){
+    public List<String> createJWTTokens(String subject, List<String> roles){
         Algorithm algorithm = Algorithm.HMAC256(secret);
         String access_token = JWT.create()
                 .withSubject(subject)
@@ -111,19 +100,7 @@ public class AuthenticationService implements UserDetailsService {
                 .withIssuedAt(java.sql.Date.from(Instant.now()))
                 .withExpiresAt(java.sql.Date.valueOf(LocalDateTime.now().plusDays(5).toLocalDate()))
                 .sign(algorithm);
-        ResponseCookie accessTokenCookie = ResponseCookie.from("access_token",access_token)
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .maxAge(24*60*60)
-                .build();
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token",refresh_token)
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .maxAge(24*60*60)
-                .build();
-        return List.of(accessTokenCookie,refreshTokenCookie);
+        return List.of(access_token,refresh_token);
     }
 
     public UserDTO validateUser(HttpServletRequest request,

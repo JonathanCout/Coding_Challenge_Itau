@@ -40,9 +40,8 @@ public class SecurityConfiguration {
                 .addFilter(new JwtCredentialsAuthenticationFilter(authenticationManager()))
                 .authenticationProvider(daoAuthenticationProvider())
                 .authorizeRequests()
-                .antMatchers( "/**").permitAll()
-                .antMatchers("/login/*","/signup/*").permitAll()
-                .antMatchers("/comment/*").hasAnyRole(UserRole.BASICO.name(),UserRole.AVANCADO.name(),UserRole.MODERADOR.name())
+                .antMatchers("/login/**","/signup/**","/refresh_token/**").permitAll()
+                .antMatchers("/comment/**").hasAnyRole(UserRole.BASICO.name(),UserRole.AVANCADO.name(),UserRole.MODERADOR.name())
                 .anyRequest().authenticated();
         return http.build();
     }

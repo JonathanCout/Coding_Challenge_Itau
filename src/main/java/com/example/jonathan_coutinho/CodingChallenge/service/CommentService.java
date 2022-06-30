@@ -29,6 +29,7 @@ public class CommentService {
     private final UserRepository userRepository;
     private final MovieRepository movieRepository;
 
+
     public Comment createCommentary(NewCommentDTO newCommentDTO) {
         User user = userRepository.findById(newCommentDTO.getUserId()).orElseThrow(() -> new NotFoundException("Usuário não encontrado."));
         Movie movie = movieRepository.findByImdbid(newCommentDTO.getMovieId()).orElseThrow(() -> new NotFoundException("Filme não encontrado."));
