@@ -53,6 +53,9 @@ public class CommentService {
         Comment comment = new Comment(replyCommentDTO,user,movie);
         comment.setDuplicate(false);
 
+        user.pointsHandler(1);
+        userRepository.save(user);
+
         return commentRepository.save(comment);
     }
 
@@ -88,8 +91,7 @@ public class CommentService {
     }
 
     @Transactional
-    public Comment updateReaction(Long id, String username, String reaction){
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+    public Comment updateReaction(Long id,String reaction){
         Comment comment = commentRepository.findById(id).orElseThrow(() -> new NotFoundException("Comentário não encontrado"));
         if(reaction.equals("like")){
             comment.setReaction(comment.getReaction() + 1);

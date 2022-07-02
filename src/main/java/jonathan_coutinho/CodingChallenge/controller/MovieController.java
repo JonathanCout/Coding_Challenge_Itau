@@ -21,7 +21,7 @@ public class MovieController {
         return ResponseEntity.ok(movieService.createMovie(id));
     }
 
-    @GetMapping("/findByTitle")
+    @GetMapping("/title")
     public ResponseEntity<Movie> getMovieByTitle(@RequestParam String title, @RequestParam(required = false) String year) {
         return ResponseEntity.ok(movieService.getMovieByTitle(title,year));
     }

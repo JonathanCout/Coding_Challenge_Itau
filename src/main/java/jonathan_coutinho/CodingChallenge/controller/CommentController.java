@@ -56,8 +56,8 @@ public class CommentController {
 
     @PutMapping("/advanced/updateReaction")
     @PreAuthorize("hasAnyRole('ROLE_AVANCADO','ROLE_MODERADOR')")
-    public ResponseEntity<Comment> patchReaction(@RequestParam Long id, @RequestParam String username, @RequestParam String reaction){
-        return ResponseEntity.ok(commentService.updateReaction(id,username,reaction));
+    public ResponseEntity<Comment> putReaction(@RequestParam Long id,@RequestParam String reaction){
+        return ResponseEntity.ok(commentService.updateReaction(id,reaction));
     }
 
     @DeleteMapping("/delete")

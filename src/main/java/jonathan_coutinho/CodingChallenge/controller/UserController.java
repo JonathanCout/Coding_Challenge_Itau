@@ -32,7 +32,7 @@ public class UserController {
         return ResponseEntity.ok(userService.buffPoints(username));
     }
 
-    @PostMapping("/moderation/upgrade")
+    @PutMapping("/moderation/upgrade")
     @PreAuthorize("hasRole('ROLE_MODERADOR')")
     public ResponseEntity<User> upgradeToModerator(@RequestParam String receiver){
         return ResponseEntity.ok(userService.upgradeUserRole(receiver));
